@@ -16,13 +16,16 @@
 #define IDD_DLG_EDIT_COMPANY            140
 #define IDD_DLG_EDIT_SCORE              142
 #define IDD_DLG_SCORE_TABLE             144
+#define IDI_ICON_COM                    146
+#define IDI_ICON_STD                    147
+#define IDI_ICON1                       148
+#define IDI_ICON_SCORE                  148
 #define IDC_EDT_USER                    1001
 #define IDC_BUTTON1                     1002
 #define IDC_EDT_VAL_1                   1003
 #define IDC_BTN_STUDENT                 1003
 #define IDC_EDIT_SCORE_DLG              1003
 #define IDC_EDT_VAL_2                   1004
-#define IDS_STRING1004                  1004
 #define IDC_EDT_RESULT                  1005
 #define IDC_RAD_SUM                     1006
 #define IDC_RAD_SUB                     1007
@@ -77,14 +80,20 @@
 #define IDC_BTN_SEARCH_SCOREDLG         1057
 #define IDC_OPEN_SCORE_TABLE            1058
 #define IDC_CHECK_DECIMAL_SCORE         1059
+#define IDC_RAD_SEARCH_NAME             1060
+#define IDC_RADIO2                      1061
+#define IDC_RAD_SEARCH_ID               1061
+#define IDC_RAD_SEARCH_NAME_SCOREDLG    1061
+#define IDC_RADIO1                      1062
+#define IDC_RAD_SEARCH_ID_SCOREDLG      1062
 
 // Next default values for new objects
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        146
+#define _APS_NEXT_RESOURCE_VALUE        149
 #define _APS_NEXT_COMMAND_VALUE         32771
-#define _APS_NEXT_CONTROL_VALUE         1060
+#define _APS_NEXT_CONTROL_VALUE         1063
 #define _APS_NEXT_SYMED_VALUE           101
 #endif
 #endif

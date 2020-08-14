@@ -13,8 +13,10 @@ IMPLEMENT_DYNAMIC(ScoreTable, CDialogEx)
 
 ScoreTable::ScoreTable(CWnd* pParent /*=nullptr*/)
 	: CDialogEx(IDD_DLG_SCORE_TABLE, pParent)
+	, rad_id_search(0)
+	, rad_name_search(1)
 {
-
+	//m_hIcon = AfxGetApp()->LoadIcon(IDI_ICON_SCORE);
 }
 
 ScoreTable::~ScoreTable()
@@ -44,6 +46,8 @@ void ScoreTable::DoDataExchange(CDataExchange* pDX)
 	CDialogEx::DoDataExchange(pDX);
 	DDX_Control(pDX, IDC_EDIT1, edt_search_scoretable_dlg);
 	DDX_Control(pDX, IDC_LCL_SCORE_TABLE, lcl_score_table);
+	DDX_Check(pDX, IDC_RAD_SEARCH_ID_SCOREDLG, rad_id_search);
+	DDX_Check(pDX, IDC_RAD_SEARCH_NAME_SCOREDLG, rad_name_search);
 
 	if (start == true) {
 		start = false;
@@ -58,17 +62,24 @@ BEGIN_MESSAGE_MAP(ScoreTable, CDialogEx)
 	ON_BN_CLICKED(IDC_EDIT_SCORE_DLG, &ScoreTable::OnBnClickedEditScoreDlg)
 END_MESSAGE_MAP()
 
+BOOL ScoreTable::OnInitDialog() {
+	CDialogEx::OnInitDialog();
+	HICON hIcon = LoadIcon(AfxGetInstanceHandle(), MAKEINTRESOURCE(IDI_ICON_SCORE));
+	SetIcon(hIcon, FALSE);
+	return TRUE;  // return TRUE  unless you set the focus to a control
+}
+
 void ScoreTable::StartDialog()
 {
 	lcl_score_table.SetExtendedStyle(LVS_EX_FULLROWSELECT | LVS_EX_GRIDLINES | LVCFMT_FIXED_RATIO);
 	lcl_score_table.InsertColumn(0, _T("ON"), LVCFMT_LEFT, 50);
-	lcl_score_table.InsertColumn(1, _T("ID"), LVCFMT_LEFT, 70);
-	lcl_score_table.InsertColumn(2, _T("Name"), LVCFMT_LEFT, 120);
-	lcl_score_table.InsertColumn(3, _T("Company"), LVCFMT_LEFT, 120);
-	lcl_score_table.InsertColumn(4, _T("week 1"), LVCFMT_LEFT, 50);
-	lcl_score_table.InsertColumn(5, _T("week 2"), LVCFMT_LEFT, 50);
-	lcl_score_table.InsertColumn(6, _T("week 3"), LVCFMT_LEFT, 50);
-	lcl_score_table.InsertColumn(7, _T("week 4"), LVCFMT_LEFT, 50);
+	lcl_score_table.InsertColumn(1, _T("ID"), LVCFMT_LEFT, 80);
+	lcl_score_table.InsertColumn(2, _T("Name"), LVCFMT_LEFT, 150);
+	lcl_score_table.InsertColumn(3, _T("Company"), LVCFMT_LEFT, 150);
+	lcl_score_table.InsertColumn(4, _T("week 1"), LVCFMT_LEFT, 60);
+	lcl_score_table.InsertColumn(5, _T("week 2"), LVCFMT_LEFT, 60);
+	lcl_score_table.InsertColumn(6, _T("week 3"), LVCFMT_LEFT, 60);
+	lcl_score_table.InsertColumn(7, _T("week 4"), LVCFMT_LEFT, 60);
 
 	if (SQL_SUCCESS != SQLAllocHandle(SQL_HANDLE_ENV, SQL_NULL_HANDLE, &sql_env_handle)) {
 		connected = false;
@@ -134,7 +145,7 @@ void ScoreTable::UpdateStudentList()
 			SQLGetData(sql_get_handle, 5, SQL_C_DEFAULT, &w2, 0, NULL);
 			SQLGetData(sql_get_handle, 6, SQL_C_DEFAULT, &w3, 0, NULL);
 			SQLGetData(sql_get_handle, 7, SQL_C_DEFAULT, &w4, 0, NULL);
-			lcl_score_table.InsertItem(stt, std::to_string(stt+1).c_str());
+			lcl_score_table.InsertItem(stt, std::to_string(stt + 1).c_str());
 			lcl_score_table.SetItemText(stt, 1, id);
 			lcl_score_table.SetItemText(stt, 2, name);
 			lcl_score_table.SetItemText(stt, 3, company);
@@ -174,7 +185,12 @@ void ScoreTable::OnBnClickedBtnSearchScoredlg()
 				SQLBindParameter(sql_get_handle, 1, SQL_PARAM_INPUT, SQL_C_CHAR, SQL_VARCHAR, 50, 0, con, 0, &cb1);
 				sprintf_s(con, "%s", condition);
 
-				SQLExecDirect(sql_get_handle, (SQLCHAR*)"select * from searchScore(?)", SQL_NTS);
+				if (rad_id_search == 1) {
+					SQLExecDirect(sql_get_handle, (SQLCHAR*)"select * from searchScoreID(?)", SQL_NTS);
+				}
+				else if (rad_name_search == 1) {
+					SQLExecDirect(sql_get_handle, (SQLCHAR*)"select * from searchScore(?)", SQL_NTS);
+				}
 
 				lcl_score_table.SetRedraw(FALSE);
 				lcl_score_table.DeleteAllItems();
@@ -216,7 +232,7 @@ void ScoreTable::OnLvnItemchangedLclScoreTable(NMHDR* pNMHDR, LRESULT* pResult)
 	LPNMLISTVIEW pNMLV = reinterpret_cast<LPNMLISTVIEW>(pNMHDR);
 	// TODO: Add your control notification handler code here
 	*pResult = 0;
-	//MessageBox(_T("wtf"));
+	//MessageBox(_T("hoho"));
 }
 
 
@@ -236,7 +252,7 @@ void ScoreTable::OnBnClickedEditScoreDlg()
 		CString str_select_id = lcl_score_table.GetItemText(int_select_row, 1);
 		CString str_select_name = lcl_score_table.GetItemText(int_select_row, 2);
 		CString str_select_company = lcl_score_table.GetItemText(int_select_row, 3);
-		
+
 		EditScore es;
 		es.GetHandle(sql_connection_handle);
 		es.GetInfo(str_select_id, str_select_name, str_select_company);

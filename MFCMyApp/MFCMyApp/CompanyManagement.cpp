@@ -32,6 +32,13 @@ CompanyManagement::~CompanyManagement()
 	}
 }
 
+BOOL CompanyManagement::OnInitDialog() {
+	CDialogEx::OnInitDialog();
+	HICON hIcon = LoadIcon(AfxGetInstanceHandle(), MAKEINTRESOURCE(IDI_ICON_COM));
+	SetIcon(hIcon, FALSE);
+	return TRUE;  // return TRUE  unless you set the focus to a control
+}
+
 void CompanyManagement::StartDialog() {
 	lcl_company.SetExtendedStyle(LVS_EX_FULLROWSELECT | LVS_EX_GRIDLINES | LVCFMT_FIXED_RATIO);
 	lcl_company.InsertColumn(0, _T("ON"), LVCFMT_LEFT, 30);

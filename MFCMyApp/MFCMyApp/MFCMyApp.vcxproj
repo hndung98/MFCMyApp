@@ -229,7 +229,13 @@
     <None Include="res\MFCMyApp.rc2" />
   </ItemGroup>
   <ItemGroup>
+    <Image Include="res\com.ico" />
+    <Image Include="res\ico00001.ico" />
+    <Image Include="res\ico00002.ico" />
+    <Image Include="res\icon1.ico" />
+    <Image Include="res\icon2.ico" />
     <Image Include="res\MFCMyApp.ico" />
+    <Image Include="res\score.ico" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -16,26 +16,42 @@ IMPLEMENT_DYNAMIC(StudentManagement, CDialogEx)
 
 StudentManagement::StudentManagement(CWnd* pParent /*=nullptr*/)
 	: CDialogEx(IDD_DLG_STUDENT, pParent)
+	, rad_search_id(0)
+	, rad_search_name(1)
 {
 
 }
 
 StudentManagement::~StudentManagement()
 {
-	if (sql_get_handle != SQL_NULL_HSTMT) {
-		SQLFreeHandle(SQL_HANDLE_STMT, sql_get_handle);
-		sql_get_handle = NULL;
+	if (sql_delete_handle != SQL_NULL_HSTMT) {
+		SQLFreeHandle(SQL_HANDLE_STMT, sql_delete_handle);
+		sql_delete_handle = NULL;
+	}
+	if (sql_update_handle != SQL_NULL_HSTMT) {
+		SQLFreeHandle(SQL_HANDLE_STMT, sql_update_handle);
+		sql_update_handle = NULL;
+	}
+	if (sql_check_handle != SQL_NULL_HSTMT) {
+		SQLFreeHandle(SQL_HANDLE_STMT, sql_check_handle);
+		sql_check_handle = NULL;
 	}
 	if (sql_connection_handle != SQL_NULL_HDBC) {
 		SQLDisconnect(sql_connection_handle);
 		SQLFreeHandle(SQL_HANDLE_DBC, sql_connection_handle);
 		sql_connection_handle = NULL;
 	}
-
 	if (sql_env_handle != SQL_NULL_HENV) {
 		SQLFreeHandle(SQL_HANDLE_ENV, sql_env_handle);
 		sql_env_handle = NULL;
 	}
+}
+
+BOOL StudentManagement::OnInitDialog() {
+	CDialogEx::OnInitDialog();
+	HICON hIcon = LoadIcon(AfxGetInstanceHandle(), MAKEINTRESOURCE(IDI_ICON_STD));
+	SetIcon(hIcon, FALSE);
+	return TRUE;  // return TRUE  unless you set the focus to a control
 }
 
 void StudentManagement::startDialog() {
@@ -48,11 +64,12 @@ void StudentManagement::startDialog() {
 	cbx_sfalculty.SetCurSel(0);
 
 	lcl_list_student.SetExtendedStyle(LVS_EX_FULLROWSELECT | LVS_EX_GRIDLINES | LVCFMT_FIXED_RATIO);
-	lcl_list_student.InsertColumn(0, _T("ID"), LVCFMT_LEFT, 70);
-	lcl_list_student.InsertColumn(1, _T("NAME"), LVCFMT_LEFT, 140);
-	lcl_list_student.InsertColumn(2, _T("EMAIL"), LVCFMT_LEFT, 140);
-	lcl_list_student.InsertColumn(3, _T("FALCULTY"), LVCFMT_LEFT, 130);
-	lcl_list_student.InsertColumn(4, _T("COMPANY"), LVCFMT_LEFT, 130);
+	lcl_list_student.InsertColumn(0, _T("ON"), LVCFMT_LEFT, 40);
+	lcl_list_student.InsertColumn(1, _T("ID"), LVCFMT_LEFT, 70);
+	lcl_list_student.InsertColumn(2, _T("NAME"), LVCFMT_LEFT, 140);
+	lcl_list_student.InsertColumn(3, _T("EMAIL"), LVCFMT_LEFT, 140);
+	lcl_list_student.InsertColumn(4, _T("FALCULTY"), LVCFMT_LEFT, 130);
+	lcl_list_student.InsertColumn(5, _T("COMPANY"), LVCFMT_LEFT, 130);
 
 	hstmt = SQL_NULL_HSTMT;
 	if (SQL_SUCCESS != SQLAllocHandle(SQL_HANDLE_ENV, SQL_NULL_HANDLE, &sql_env_handle)) {
@@ -139,6 +156,8 @@ void StudentManagement::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_TXT_COUNT_STUDENT, txt_count_student_stddlg);
 	DDX_Control(pDX, IDC_CBX_COMPANY, cbx_company_list);
 	DDX_Control(pDX, IDC_EDT_SEARCH, edt_search_stddlg);
+	DDX_Check(pDX, IDC_RAD_SEARCH_ID, rad_search_id);
+	DDX_Check(pDX, IDC_RAD_SEARCH_NAME, rad_search_name);
 	if (start == TRUE) {
 		start = FALSE;
 		startDialog();
@@ -174,7 +193,7 @@ void StudentManagement::UpdateStudentList()
 			lcl_list_student.SetRedraw(FALSE);
 			lcl_list_student.DeleteAllItems();
 			lcl_list_student.SetRedraw(TRUE);
-
+			int stt = 0;
 			char id[10], username[50], email[50], sname[50], falculty[50], company[50];
 			while (SQLFetch(sql_get_handle) == SQL_SUCCESS)
 			{
@@ -184,16 +203,20 @@ void StudentManagement::UpdateStudentList()
 				SQLGetData(sql_get_handle, 4, SQL_C_CHAR, email, 50, NULL);
 				SQLGetData(sql_get_handle, 5, SQL_C_CHAR, falculty, 50, NULL);
 				SQLGetData(sql_get_handle, 6, SQL_C_CHAR, company, 50, NULL);
-				lcl_list_student.InsertItem(0, id);
-				lcl_list_student.SetItemText(0, 1, sname);
-				lcl_list_student.SetItemText(0, 2, email);
-				lcl_list_student.SetItemText(0, 3, falculty);
-				lcl_list_student.SetItemText(0, 4, company);
+				lcl_list_student.InsertItem(stt, std::to_string(stt+1).c_str());
+				lcl_list_student.SetItemText(stt, 1, id);
+				lcl_list_student.SetItemText(stt, 2, sname);
+				lcl_list_student.SetItemText(stt, 3, email);
+				lcl_list_student.SetItemText(stt, 4, falculty);
+				lcl_list_student.SetItemText(stt++, 5, company);
 			}
 			/*MessageBox(_T("Successfully!"));*/
 
 		}
 	} while (FALSE);
+	SQLFreeStmt(sql_get_handle, SQL_CLOSE);
+	SQLFreeStmt(sql_get_handle, SQL_UNBIND);
+	SQLFreeStmt(sql_get_handle, SQL_RESET_PARAMS);
 	UpdateData(FALSE);
 	UpdateStudentCount();
 	/*if (sql_get_handle != SQL_NULL_HSTMT) {
@@ -203,7 +226,7 @@ void StudentManagement::UpdateStudentList()
 }
 
 void StudentManagement::OnLButtonDblClk(UINT nFlags, CPoint point) {
-	POSITION pos = lcl_list_student.GetFirstSelectedItemPosition();
+	/*POSITION pos = lcl_list_student.GetFirstSelectedItemPosition();
 	if (pos == NULL) {
 
 	}
@@ -211,7 +234,7 @@ void StudentManagement::OnLButtonDblClk(UINT nFlags, CPoint point) {
 		int n = lcl_list_student.GetNextSelectedItem(pos);
 		CString str = std::to_string(n).c_str();
 		MessageBox(str);
-	}
+	}*/
 	
 	//MessageBox(_T(output));
 	/*CString str_ = _T("-");
@@ -278,9 +301,11 @@ void StudentManagement::OnBnClickedBtnSmAdd()
 				break;
 			}
 		}
-		
+		SQLFreeStmt(sql_check_handle, SQL_CLOSE);
+		SQLFreeStmt(sql_check_handle, SQL_UNBIND);
+		SQLFreeStmt(sql_check_handle, SQL_RESET_PARAMS);
 		if (allow_add == false) {
-			MessageBox(_T("allow = false"));
+			//MessageBox(_T("allow = false"));
 			return;
 		}
 		else {
@@ -327,6 +352,7 @@ void StudentManagement::OnBnClickedBtnSmAdd()
 void StudentManagement::OnBnClickedBtnGetData()
 {
 	//Search 
+	
 	CString condition;
 	edt_search_stddlg.GetWindowText(condition);
 	if (condition.GetLength() > 0) {
@@ -343,13 +369,19 @@ void StudentManagement::OnBnClickedBtnGetData()
 				SQLBindParameter(sql_get_handle, 1, SQL_PARAM_INPUT, SQL_C_CHAR, SQL_VARCHAR, 50, 0, con, 0, &cb1);
 				sprintf_s(con, "%s", condition);
 
-				SQLExecDirect(sql_get_handle, (SQLCHAR*)"select * from searchName(?)", SQL_NTS);
+				if (rad_search_id == 1) {
+					SQLExecDirect(sql_get_handle, (SQLCHAR*)"select * from searchID(?)", SQL_NTS);
+				}
+				else if (rad_search_name == 1) {
+					SQLExecDirect(sql_get_handle, (SQLCHAR*)"select * from searchName(?)", SQL_NTS);
+				}
 
 				lcl_list_student.SetRedraw(FALSE);
 				lcl_list_student.DeleteAllItems();
 				lcl_list_student.SetRedraw(TRUE);
 
 				char id[10], username[50], email[50], sname[50], falculty[50], company[50];
+				int stt = 0;
 				while (SQLFetch(sql_get_handle) == SQL_SUCCESS)
 				{
 					SQLGetData(sql_get_handle, 1, SQL_C_CHAR, id, 10, NULL);
@@ -358,11 +390,12 @@ void StudentManagement::OnBnClickedBtnGetData()
 					SQLGetData(sql_get_handle, 4, SQL_C_CHAR, email, 50, NULL);
 					SQLGetData(sql_get_handle, 5, SQL_C_CHAR, falculty, 50, NULL);
 					SQLGetData(sql_get_handle, 6, SQL_C_CHAR, company, 50, NULL);
-					lcl_list_student.InsertItem(0, id);
-					lcl_list_student.SetItemText(0, 1, sname);
-					lcl_list_student.SetItemText(0, 2, email);
-					lcl_list_student.SetItemText(0, 3, falculty);
-					lcl_list_student.SetItemText(0, 4, company);
+					lcl_list_student.InsertItem(stt, std::to_string(stt+1).c_str());
+					lcl_list_student.SetItemText(stt, 1, id);
+					lcl_list_student.SetItemText(stt, 2, sname);
+					lcl_list_student.SetItemText(stt, 3, email);
+					lcl_list_student.SetItemText(stt, 4, falculty);
+					lcl_list_student.SetItemText(stt++, 5, company);
 				}
 			}
 		} while (FALSE);
@@ -484,7 +517,6 @@ void StudentManagement::OnStnClickedTxtCountStudent()
 {
 	// TODO: Add your control notification handler code here
 }
-
 
 void StudentManagement::OnBnClickedBtnEditScore()
 {

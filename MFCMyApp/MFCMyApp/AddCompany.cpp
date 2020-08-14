@@ -19,6 +19,9 @@ AddCompany::AddCompany(CWnd* pParent /*=nullptr*/)
 
 AddCompany::~AddCompany()
 {
+	if (sql_add_handle != SQL_NULL_HSTMT) {
+		SQLFreeHandle(SQL_HANDLE_STMT, sql_add_handle);
+	}
 }
 
 void AddCompany::StartDialog() {

@@ -25,6 +25,10 @@ public:
 #endif
 
 protected:
+	HICON m_hIcon;
+
+	// Generated message map functions
+	virtual BOOL OnInitDialog();
 	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV support
 
 	DECLARE_MESSAGE_MAP()
@@ -43,4 +47,7 @@ public :
 	afx_msg void OnBnClickedBtnSearchScoredlg();
 	afx_msg void OnLvnItemchangedLclScoreTable(NMHDR* pNMHDR, LRESULT* pResult);
 	afx_msg void OnBnClickedEditScoreDlg();
+protected:
+	int rad_id_search;
+	int rad_name_search;
 };
