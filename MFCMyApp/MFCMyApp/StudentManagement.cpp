@@ -24,6 +24,10 @@ StudentManagement::StudentManagement(CWnd* pParent /*=nullptr*/)
 
 StudentManagement::~StudentManagement()
 {
+	if (sql_add_handle != SQL_NULL_HSTMT) {
+		SQLFreeHandle(SQL_HANDLE_STMT, sql_add_handle);
+		sql_add_handle = NULL;
+	}
 	if (sql_delete_handle != SQL_NULL_HSTMT) {
 		SQLFreeHandle(SQL_HANDLE_STMT, sql_delete_handle);
 		sql_delete_handle = NULL;

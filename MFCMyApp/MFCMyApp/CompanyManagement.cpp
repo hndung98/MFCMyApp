@@ -19,6 +19,12 @@ CompanyManagement::CompanyManagement(CWnd* pParent /*=nullptr*/)
 
 CompanyManagement::~CompanyManagement()
 {
+	if (sql_add_handle != SQL_NULL_HSTMT) {
+		SQLFreeHandle(SQL_HANDLE_STMT, sql_add_handle);
+	}
+	if (sql_edit_handle != SQL_NULL_HSTMT) {
+		SQLFreeHandle(SQL_HANDLE_STMT, sql_edit_handle);
+	}
 	if (sql_get_handle != SQL_NULL_HSTMT) {
 		SQLFreeHandle(SQL_HANDLE_STMT, sql_get_handle);
 	}

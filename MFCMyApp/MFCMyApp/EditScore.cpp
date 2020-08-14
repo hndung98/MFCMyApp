@@ -19,9 +19,13 @@ EditScore::EditScore(CWnd* pParent /*=nullptr*/)
 
 EditScore::~EditScore()
 {
-	if (sql_connection_handle != SQL_NULL_HENV) {
-		SQLFreeHandle(SQL_HANDLE_ENV, sql_connection_handle);
-		sql_connection_handle = NULL;
+	if (sql_get_handle != SQL_NULL_HENV) {
+		SQLFreeHandle(SQL_HANDLE_ENV, sql_get_handle);
+		sql_get_handle = NULL;
+	}
+	if (sql_update_handle != SQL_NULL_HENV) {
+		SQLFreeHandle(SQL_HANDLE_ENV, sql_update_handle);
+		sql_update_handle = NULL;
 	}
 }
 
