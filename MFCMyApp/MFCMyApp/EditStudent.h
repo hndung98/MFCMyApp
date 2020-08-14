@@ -38,7 +38,7 @@ protected:
 	CComboBox cbx_falculty_editdlg;
 	CEdit edt_name_editdlg;
 	CEdit edt_email;
-	CEdit edit_company_editdlg;
+	//CEdit edit_company_editdlg;
 	bool start = true;
 	CString student_id = _T("-1");
 	CStatic txt_student_id_edtdlg;
@@ -46,6 +46,7 @@ protected:
 	SQLHANDLE sql_env_handle;
 	SQLHANDLE sql_connection_handle;
 	SQLHANDLE sql_update_handle;
+	SQLHANDLE sql_get_handle;
 	SQLRETURN retcode = 0;
 	bool connected = true;
 
@@ -53,4 +54,5 @@ protected:
 	CString student_name;
 	CString student_company;
 	CString student_falculty;
+	CComboBox cbx_company;
 };

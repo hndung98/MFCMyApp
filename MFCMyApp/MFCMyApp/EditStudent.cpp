@@ -19,20 +19,24 @@ EditStudent::EditStudent(CWnd* pParent /*=nullptr*/)
 
 EditStudent::~EditStudent()
 {
+	if (sql_get_handle != SQL_NULL_HSTMT) {
+		SQLFreeHandle(SQL_HANDLE_STMT, sql_get_handle);
+		sql_get_handle = NULL;
+	}
 	if (sql_update_handle != SQL_NULL_HSTMT) {
 		SQLFreeHandle(SQL_HANDLE_STMT, sql_update_handle);
 		sql_update_handle = NULL;
 	}
-	if (sql_connection_handle != SQL_NULL_HDBC) {
-		SQLDisconnect(sql_connection_handle);
-		SQLFreeHandle(SQL_HANDLE_DBC, sql_connection_handle);
-		sql_connection_handle = NULL;
-	}
+	//if (sql_connection_handle != SQL_NULL_HDBC) {
+	//	SQLDisconnect(sql_connection_handle);
+	//	SQLFreeHandle(SQL_HANDLE_DBC, sql_connection_handle);
+	//	sql_connection_handle = NULL;
+	//}
 
-	if (sql_env_handle != SQL_NULL_HENV) {
-		SQLFreeHandle(SQL_HANDLE_ENV, sql_env_handle);
-		sql_env_handle = NULL;
-	}
+	//if (sql_env_handle != SQL_NULL_HENV) {
+	//	SQLFreeHandle(SQL_HANDLE_ENV, sql_env_handle);
+	//	sql_env_handle = NULL;
+	//}
 }
 
 void EditStudent::DoDataExchange(CDataExchange* pDX)
@@ -41,8 +45,9 @@ void EditStudent::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_CBX_FALCULTY_EDITSDLG, cbx_falculty_editdlg);
 	DDX_Control(pDX, IDC_EDIT1, edt_name_editdlg);
 	DDX_Control(pDX, IDC_EDIT2, edt_email);
-	DDX_Control(pDX, IDC_EDIT3, edit_company_editdlg);
+	//DDX_Control(pDX, IDC_EDIT3, edit_company_editdlg);
 	DDX_Control(pDX, IDC_TXT_SID_EDITDIALOG, txt_student_id_edtdlg);
+	DDX_Control(pDX, IDC_CBX_COM_EDTDLG, cbx_company);
 	if (start == true) {//started
 		start = false;
 		StartDialog();
@@ -50,7 +55,7 @@ void EditStudent::DoDataExchange(CDataExchange* pDX)
 }
 void EditStudent::StartDialog() {
 	edt_email.SetLimitText(49);
-	edit_company_editdlg.SetLimitText(49);
+	//edit_company_editdlg.SetLimitText(49);
 	edt_name_editdlg.SetLimitText(49);
 
 	cbx_falculty_editdlg.AddString(_T("Computer Science"));
@@ -65,9 +70,30 @@ void EditStudent::StartDialog() {
 	txt_student_id_edtdlg.SetWindowText(student_id);
 	edt_name_editdlg.SetWindowText(student_name);
 	edt_email.SetWindowText(student_email);
-	edit_company_editdlg.SetWindowText(student_company);
 
-	GetConnectDB();
+	if (SQL_SUCCESS != SQLAllocHandle(SQL_HANDLE_STMT, sql_connection_handle, &sql_get_handle)) {
+		MessageBox(_T("get handle failed"));
+	}
+	if (SQL_SUCCESS != SQLExecDirect(sql_get_handle, (SQLCHAR*)"select * from company", SQL_NTS))
+	{
+		MessageBox(_T("execdirect get failed"));
+	}
+	else
+	{
+		char id[50];
+		int num = 0;
+		while (SQLFetch(sql_get_handle) == SQL_SUCCESS)
+		{
+			SQLGetData(sql_get_handle, 1, SQL_C_CHAR, id, 50, NULL);
+			cbx_company.AddString((CString)id);
+		}
+	}
+	SQLFreeStmt(sql_get_handle, SQL_CLOSE);
+	SQLFreeStmt(sql_get_handle, SQL_UNBIND);
+	SQLFreeStmt(sql_get_handle, SQL_RESET_PARAMS);
+
+	//edit_company_editdlg.SetWindowText(student_company);
+	//GetConnectDB();
 }
 
 //void EditStudent::SetHandle(SQLHANDLE handle)
@@ -83,6 +109,12 @@ void EditStudent::SetID(CString ID)
 { 
 	student_id = ID;
 }
+
+void EditStudent::SetHandle(SQLHANDLE handle)
+{
+	sql_connection_handle = handle;
+}
+
 void EditStudent::GetConnectDB() {
 	if (SQL_SUCCESS != SQLAllocHandle(SQL_HANDLE_ENV, SQL_NULL_HANDLE, &sql_env_handle)) {
 		connected = false;
@@ -126,15 +158,25 @@ void EditStudent::SetInfo(CString falculty, CString name, CString email, CString
 void EditStudent::OnBnClickedOk()
 {
 	UpdateData(TRUE);
-	if (MessageBox(_T("Are you sure?"), _T("Confirm"), MB_OKCANCEL) == IDOK) {
+	edt_email.GetWindowText(student_email);
+	edt_name_editdlg.GetWindowText(student_name);
+	//edit_company_editdlg.GetWindowText(student_company);
+	cbx_falculty_editdlg.GetLBText(cbx_falculty_editdlg.GetCurSel(), student_falculty);
+	if (student_name.GetLength() == 0) {
+		MessageBox(_T("Name is empty"));
+	}
+	else if (student_email.GetLength() == 0) {
+		MessageBox(_T("Email is empty"));
+	}
+	else if (cbx_company.GetCurSel() == -1) {
+		MessageBox(_T("Company is empty"));
+	}
+	else if (MessageBox(_T("Are you sure?"), _T("Confirm"), MB_OKCANCEL) == IDOK) {
 		if (SQL_SUCCESS != SQLAllocHandle(SQL_HANDLE_STMT, sql_connection_handle, &sql_update_handle)) {
 			//MessageBox(_T("connect failed"));
 			return;
 		}
-		edt_email.GetWindowText(student_email);
-		edt_name_editdlg.GetWindowText(student_name);
-		edit_company_editdlg.GetWindowText(student_company);
-		cbx_falculty_editdlg.GetLBText(cbx_falculty_editdlg.GetCurSel(), student_falculty);
+		cbx_company.GetLBText(cbx_company.GetCurSel(), student_company);
 		SQLINTEGER cb1 = SQL_NTS;
 		SQLINTEGER cb2 = SQL_NTS;
 		SQLINTEGER cb3 = SQL_NTS;

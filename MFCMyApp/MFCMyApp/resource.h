@@ -84,8 +84,9 @@
 #define IDC_RADIO2                      1061
 #define IDC_RAD_SEARCH_ID               1061
 #define IDC_RAD_SEARCH_NAME_SCOREDLG    1061
-#define IDC_RADIO1                      1062
 #define IDC_RAD_SEARCH_ID_SCOREDLG      1062
+#define IDC_COMBO1                      1063
+#define IDC_CBX_COM_EDTDLG              1064
 
 // Next default values for new objects
 // 
@@ -93,7 +94,7 @@
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        149
 #define _APS_NEXT_COMMAND_VALUE         32771
-#define _APS_NEXT_CONTROL_VALUE         1063
+#define _APS_NEXT_CONTROL_VALUE         1064
 #define _APS_NEXT_SYMED_VALUE           101
 #endif
 #endif

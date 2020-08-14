@@ -502,12 +502,13 @@ void StudentManagement::OnBnClickedBtnEditStddlg()
 
 	if (int_select_pos != -1) {
 		CString str_select_pos = std::to_string(int_select_pos).c_str();
-		CString str_select_id = lcl_list_student.GetItemText(int_select_pos, 0);
-		CString str_select_name = lcl_list_student.GetItemText(int_select_pos, 1);
-		CString str_select_email = lcl_list_student.GetItemText(int_select_pos, 2);
-		CString str_select_falculty = lcl_list_student.GetItemText(int_select_pos, 3);
-		CString str_select_company = lcl_list_student.GetItemText(int_select_pos, 4);
+		CString str_select_id = lcl_list_student.GetItemText(int_select_pos, 1);
+		CString str_select_name = lcl_list_student.GetItemText(int_select_pos, 2);
+		CString str_select_email = lcl_list_student.GetItemText(int_select_pos, 3);
+		CString str_select_falculty = lcl_list_student.GetItemText(int_select_pos, 4);
+		CString str_select_company = lcl_list_student.GetItemText(int_select_pos, 5);
 		EditStudent es;
+		es.SetHandle(sql_connection_handle);
 		es.SetID(str_select_id);
 		es.SetInfo(str_select_falculty, str_select_name, str_select_email, str_select_company);
 		es.DoModal();
@@ -535,9 +536,9 @@ void StudentManagement::OnBnClickedBtnEditScore()
 		}
 	}
 	if (int_select_pos != -1) {
-		CString sid = lcl_list_student.GetItemText(int_select_pos, 0);
-		CString sname = lcl_list_student.GetItemText(int_select_pos, 1);
-		CString scompany = lcl_list_student.GetItemText(int_select_pos, 4);
+		CString sid = lcl_list_student.GetItemText(int_select_pos, 1);
+		CString sname = lcl_list_student.GetItemText(int_select_pos, 2);
+		CString scompany = lcl_list_student.GetItemText(int_select_pos, 5);
 		
 		EditScore es;
 		es.GetHandle(sql_connection_handle);
