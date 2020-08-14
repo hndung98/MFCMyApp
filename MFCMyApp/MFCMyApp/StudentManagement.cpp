@@ -309,11 +309,12 @@ void StudentManagement::OnBnClickedBtnSmAdd()
 			return;
 		}
 		else {
-			lcl_list_student.InsertItem(0, str_ID);
-			lcl_list_student.SetItemText(0, 1, str_name);
-			lcl_list_student.SetItemText(0, 2, str_email);
-			lcl_list_student.SetItemText(0, 3, str_falculty);
-			lcl_list_student.SetItemText(0, 4, str_company);
+			/*lcl_list_student.InsertItem(0, 0);
+			lcl_list_student.SetItemText(0, 1, str_ID);
+			lcl_list_student.SetItemText(0, 2, str_name);
+			lcl_list_student.SetItemText(0, 3, str_email);
+			lcl_list_student.SetItemText(0, 4, str_falculty);
+			lcl_list_student.SetItemText(0, 5, str_company);*/
 
 			SQLINTEGER cb1 = SQL_NTS, cb2 = SQL_NTS, cb3 = SQL_NTS, cb4 = SQL_NTS, cb5 = SQL_NTS, cb6 = SQL_NTS;
 			char id[10], name[50], uname[30], email[50], falculty[50], company[50];
@@ -346,6 +347,7 @@ void StudentManagement::OnBnClickedBtnSmAdd()
 	SQLFreeStmt(sql_add_handle, SQL_UNBIND);
 	SQLFreeStmt(sql_add_handle, SQL_RESET_PARAMS);
 	UpdateData(FALSE);
+	UpdateStudentList();
 	UpdateStudentCount();
 }
 

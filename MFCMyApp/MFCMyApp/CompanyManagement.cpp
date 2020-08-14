@@ -160,6 +160,9 @@ void CompanyManagement::UpdateCompanyList()
 
 		}
 	} while (FALSE);
+	SQLFreeStmt(sql_get_handle, SQL_CLOSE);
+	SQLFreeStmt(sql_get_handle, SQL_UNBIND);
+	SQLFreeStmt(sql_get_handle, SQL_RESET_PARAMS);
 	UpdateData(FALSE);
 };
 void CompanyManagement::OnBnClickedOk()

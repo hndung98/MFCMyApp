@@ -19,9 +19,7 @@ AddCompany::AddCompany(CWnd* pParent /*=nullptr*/)
 
 AddCompany::~AddCompany()
 {
-	if (sql_add_handle != SQL_NULL_HSTMT) {
-		SQLFreeHandle(SQL_HANDLE_STMT, sql_add_handle);
-	}
+	
 }
 
 void AddCompany::StartDialog() {
@@ -69,10 +67,10 @@ void AddCompany::OnBnClickedOk()
 		SQLINTEGER cb1 = SQL_NTS, cb2 = SQL_NTS, cb3 = SQL_NTS, cb4 = SQL_NTS;
 		char name[50], intro[100], email[50], addr[50];
 
-		SQLBindParameter(sql_add_handle, 1, SQL_PARAM_INPUT, SQL_C_CHAR, SQL_VARCHAR, 20, 0, name, 0, &cb1);
-		SQLBindParameter(sql_add_handle, 2, SQL_PARAM_INPUT, SQL_C_CHAR, SQL_VARCHAR, 20, 0, intro, 0, &cb2);
-		SQLBindParameter(sql_add_handle, 3, SQL_PARAM_INPUT, SQL_C_CHAR, SQL_VARCHAR, 20, 0, addr, 0, &cb3);
-		SQLBindParameter(sql_add_handle, 4, SQL_PARAM_INPUT, SQL_C_CHAR, SQL_VARCHAR, 20, 0, email, 0, &cb4);
+		SQLBindParameter(sql_add_handle, 1, SQL_PARAM_INPUT, SQL_C_CHAR, SQL_VARCHAR, 50, 0, name, 0, &cb1);
+		SQLBindParameter(sql_add_handle, 2, SQL_PARAM_INPUT, SQL_C_CHAR, SQL_VARCHAR, 100, 0, intro, 0, &cb2);
+		SQLBindParameter(sql_add_handle, 3, SQL_PARAM_INPUT, SQL_C_CHAR, SQL_VARCHAR, 50, 0, addr, 0, &cb3);
+		SQLBindParameter(sql_add_handle, 4, SQL_PARAM_INPUT, SQL_C_CHAR, SQL_VARCHAR, 50, 0, email, 0, &cb4);
 
 		sprintf_s(name, "%s", csName);
 		sprintf_s(intro, "%s", csIntro);
